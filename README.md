@@ -27,7 +27,7 @@ A personal dashboard to trigger and manage N8N workflows via webhooks. Built wit
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/mattruiz123/n8n-workflow-dashboard.git
+   git clone https://github.com/trouthouse-tech/n8n-dashboard.git
    cd n8n-workflow-dashboard
    ```
 
