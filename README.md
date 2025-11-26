@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# N8N Workflow Dashboard
+
+A personal dashboard to trigger and manage N8N workflows via webhooks. Built with Next.js, React, Redux, and Tailwind CSS.
+
+![N8N Workflow Dashboard](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
+![Redux](https://img.shields.io/badge/Redux-Toolkit-purple?style=flat-square&logo=redux)
+
+## Features
+
+- **Workflow Management** — Create, edit, and delete workflow configurations
+- **Dynamic Request Builder** — Build custom request bodies with key-value pairs
+- **Webhook Triggering** — Trigger N8N workflows and view responses in real-time
+- **Execution History** — Track all workflow executions with status and response data
+- **Response Parsing** — JSON responses are parsed and displayed in a structured tree view
+- **Local Storage** — All data persists locally in your browser (no backend required)
+- **Portrait-Optimized UI** — Designed for vertical/portrait displays
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+ 
+- npm, yarn, or pnpm
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/mattruiz123/n8n-workflow-dashboard.git
+   cd n8n-workflow-dashboard
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Usage
+
+### Creating a Workflow
+
+1. Click **"+ Add Workflow"** on the home page
+2. Enter a name for your workflow
+3. Paste your N8N webhook URL (e.g., `https://your-n8n.app.n8n.cloud/webhook/xxx`)
+4. Optionally add default body parameters
+5. Click **"Create Workflow"**
+
+### Triggering a Workflow
+
+1. Click **"Run"** on any workflow card
+2. Modify the request body parameters if needed
+3. Click **"Trigger Workflow"**
+4. View the response in real-time
+
+### Viewing Execution History
+
+- Each workflow detail page shows the last 10 executions
+- Click on any execution to see full details including:
+  - Request URL and body
+  - Parsed JSON response
+  - Error messages (if any)
+
+## Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **Storage**: Browser localStorage
+
+## Project Structure
+
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── api/                # API routes (webhook proxy)
+│   ├── workflow/[id]/      # Workflow detail page
+│   └── workflow-execution/[id]/  # Execution detail page
+├── components/             # Shared components
+├── model/                  # TypeScript type definitions
+├── packages/               # Feature components
+│   ├── workflow-list/      # Workflow list & modal
+│   ├── workflow-detail/    # Workflow execution UI
+│   └── workflow-execution-detail/  # Execution details
+└── store/                  # Redux store
+    ├── builders/           # UI state slices
+    ├── current/            # Current entity slices
+    ├── dumps/              # Data collection slices
+    └── thunks/             # Async actions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How It Works
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Workflows** are saved configurations containing a webhook URL and default parameters
+2. When you trigger a workflow, the request is proxied through a Next.js API route to avoid CORS issues
+3. The execution (request + response) is saved to localStorage for history
+4. All data is stored locally in your browser — no external database required
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## N8N Webhook Setup
 
-## Learn More
+To use this dashboard, you need N8N workflows with webhook triggers:
 
-To learn more about Next.js, take a look at the following resources:
+1. In N8N, create a workflow with a **Webhook** node as the trigger
+2. Set the webhook to accept POST requests
+3. Copy the **Production** webhook URL (not the test URL)
+4. Make sure your workflow is **activated**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+> **Note**: Test webhook URLs (`/webhook-test/...`) only work when the workflow editor is open. Use production URLs for the dashboard.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+Contributions are welcome! Feel free to open issues or submit pull requests.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT License — see [LICENSE](LICENSE) for details.
