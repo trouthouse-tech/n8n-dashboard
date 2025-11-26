@@ -80,7 +80,7 @@ export const WorkflowExecutionDetail = () => {
         </div>
       )}
 
-      {parsedResponse && (
+      {parsedResponse !== null && (
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>Response</h2>
           <div className={styles.responseContainer}>
@@ -181,7 +181,7 @@ const ResponseTree = ({ data, depth = 0 }: ResponseTreeProps) => {
 
 const styles = {
   container: `
-    flex flex-col gap-5
+    flex flex-col gap-6
   `,
   notFound: `
     text-center py-12 text-slate-400
@@ -196,7 +196,7 @@ const styles = {
     flex items-center justify-between
   `,
   title: `
-    text-xl font-bold text-white
+    text-2xl font-bold text-white
   `,
   date: `
     text-slate-500 text-sm
@@ -211,13 +211,13 @@ const styles = {
     text-xs font-medium text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full
   `,
   section: `
-    bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 flex flex-col gap-3
+    bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 md:p-6 flex flex-col gap-4
   `,
   errorSection: `
-    bg-red-500/5 border border-red-500/20 rounded-xl p-4 flex flex-col gap-3
+    bg-red-500/5 border border-red-500/20 rounded-xl p-5 md:p-6 flex flex-col gap-4
   `,
   sectionTitle: `
-    text-sm font-medium text-slate-300 uppercase tracking-wider
+    text-sm font-medium text-slate-300 uppercase tracking-wider mb-2
   `,
   infoRow: `
     flex flex-col gap-1
@@ -229,65 +229,65 @@ const styles = {
     text-sm text-slate-300 font-mono break-all
   `,
   bodyParams: `
-    flex flex-col gap-2
+    flex flex-col gap-3
   `,
   paramsList: `
-    flex flex-col gap-1
+    flex flex-col gap-2
   `,
   paramItem: `
-    flex items-center gap-2 text-sm
+    flex items-center gap-3 text-sm bg-slate-900/30 px-3 py-2 rounded-lg
   `,
   paramKey: `
-    text-amber-400 font-mono
+    text-amber-400 font-mono font-medium
   `,
   paramValue: `
-    text-slate-300 font-mono
+    text-slate-300 font-mono flex-1
   `,
   errorMessage: `
     text-red-400 text-sm
   `,
   responseContainer: `
-    bg-slate-900/50 border border-slate-700/30 rounded-lg p-4 overflow-x-auto
+    bg-slate-900/50 border border-slate-700/30 rounded-lg p-5 overflow-x-auto max-h-[70vh] overflow-y-auto
   `,
   rawResponse: `
-    text-slate-300 text-xs font-mono whitespace-pre-wrap
+    text-slate-300 text-sm font-mono whitespace-pre-wrap
   `,
   // Tree styles
   objectContainer: `
-    flex flex-col gap-2
+    flex flex-col gap-3
   `,
   objectProperty: `
-    flex flex-wrap items-start gap-2
+    grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 items-start
   `,
   propertyKey: `
-    text-amber-400 font-mono text-sm font-medium
+    text-amber-400 font-mono text-sm font-medium whitespace-nowrap
   `,
   propertySeparator: `
-    text-slate-500
+    hidden
   `,
   propertyValue: `
-    flex-1 min-w-0
+    min-w-0
   `,
   arrayContainer: `
-    flex flex-col gap-1
+    flex flex-col gap-2
   `,
   bracket: `
     text-slate-500 font-mono text-sm
   `,
   arrayItems: `
-    pl-4 border-l border-slate-700/50 flex flex-col gap-2
+    pl-4 border-l-2 border-slate-700/50 flex flex-col gap-3 ml-2
   `,
   arrayItem: `
-    flex items-start gap-2
+    flex items-start gap-3
   `,
   arrayIndex: `
-    text-slate-600 font-mono text-xs min-w-[20px]
+    text-slate-500 font-mono text-xs min-w-[24px] bg-slate-800/50 px-1.5 py-0.5 rounded
   `,
   valueString: `
     text-emerald-400 font-mono text-sm break-all
   `,
   valueLongString: `
-    bg-slate-800/50 rounded p-2 max-h-32 overflow-y-auto
+    bg-slate-800/50 rounded-lg p-3 max-h-48 overflow-y-auto w-full
   `,
   valueNumber: `
     text-sky-400 font-mono text-sm

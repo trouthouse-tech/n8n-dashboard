@@ -18,6 +18,6 @@ const styles = {
     flex justify-center p-4
   `,
   column: `
-    w-full max-w-md flex flex-col gap-4 py-6
+    w-full max-w-xl flex flex-col gap-4 py-6
   `,
 };
