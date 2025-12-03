@@ -10,11 +10,18 @@ export const saveWorkflowThunk = (
 ): AppThunk<ResponseType> => {
   return async (dispatch, getState): ResponseType => {
     try {
+      const userId = getState().currentUser.id;
+      if (!userId) {
+        console.error('No user ID found');
+        return { status: 400 };
+      }
+
       const isNew = !workflow.id || !getState().workflows[workflow.id];
 
       if (isNew) {
         // Create new workflow
         const response = await createWorkflow({
+          userId,
           name: workflow.name,
           description: workflow.description,
           webhookUrl: workflow.webhookUrl,

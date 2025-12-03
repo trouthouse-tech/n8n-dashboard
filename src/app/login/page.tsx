@@ -1,25 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/auth';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn, signUp, user, loading } = useAuth();
+  const { signIn, user, loading } = useAuth();
 
-  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Redirect if already logged in
-  if (!loading && user) {
-    router.push('/welcome');
-    return null;
-  }
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/welcome');
+    }
+  }, [user, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,23 +27,18 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      if (isSignUp) {
-        await signUp(email, password);
-      } else {
-        await signIn(email, password);
-      }
+      await signIn(email, password);
       router.push('/welcome');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-      // Clean up Firebase error messages
       if (errorMessage.includes('auth/invalid-credential')) {
         setError('Invalid email or password');
-      } else if (errorMessage.includes('auth/email-already-in-use')) {
-        setError('Email already in use');
-      } else if (errorMessage.includes('auth/weak-password')) {
-        setError('Password should be at least 6 characters');
       } else if (errorMessage.includes('auth/invalid-email')) {
         setError('Invalid email address');
+      } else if (errorMessage.includes('auth/user-not-found')) {
+        setError('No account found with this email');
+      } else if (errorMessage.includes('auth/wrong-password')) {
+        setError('Incorrect password');
       } else {
         setError(errorMessage);
       }
@@ -52,7 +47,7 @@ export default function LoginPage() {
     }
   };
 
-  if (loading) {
+  if (loading || user) {
     return (
       <div className={styles.page}>
         <div className={styles.loadingContainer}>
@@ -72,14 +67,8 @@ export default function LoginPage() {
         <div className={styles.card}>
           <div className={styles.header}>
             <div className={styles.logoMark}>⚡</div>
-            <h1 className={styles.title}>
-              {isSignUp ? 'Create Account' : 'Welcome Back'}
-            </h1>
-            <p className={styles.subtitle}>
-              {isSignUp
-                ? 'Sign up to start managing your workflows'
-                : 'Sign in to your dashboard'}
-            </p>
+            <h1 className={styles.title}>Welcome Back</h1>
+            <p className={styles.subtitle}>Sign in to your dashboard</p>
           </div>
 
           <form onSubmit={handleSubmit} className={styles.form}>
@@ -117,8 +106,7 @@ export default function LoginPage() {
                 className={styles.input}
                 placeholder="••••••••"
                 required
-                autoComplete={isSignUp ? 'new-password' : 'current-password'}
-                minLength={6}
+                autoComplete="current-password"
               />
             </div>
 
@@ -129,8 +117,6 @@ export default function LoginPage() {
             >
               {isSubmitting ? (
                 <div className={styles.buttonSpinner} />
-              ) : isSignUp ? (
-                'Create Account'
               ) : (
                 'Sign In'
               )}
@@ -138,19 +124,10 @@ export default function LoginPage() {
           </form>
 
           <div className={styles.toggleSection}>
-            <p className={styles.toggleText}>
-              {isSignUp ? 'Already have an account?' : "Don't have an account?"}
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setError('');
-              }}
-              className={styles.toggleButton}
-            >
-              {isSignUp ? 'Sign In' : 'Sign Up'}
-            </button>
+            <p className={styles.toggleText}>Don&apos;t have an account?</p>
+            <Link href="/signup" className={styles.toggleButton}>
+              Sign Up
+            </Link>
           </div>
         </div>
       </div>
@@ -236,4 +213,3 @@ const styles = {
     hover:text-amber-400 transition-colors
   `,
 };
-

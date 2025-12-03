@@ -19,7 +19,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<User | null>;
   signOut: () => Promise<void>;
 }
 
@@ -27,7 +27,7 @@ export const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   signIn: async () => {},
-  signUp: async () => {},
+  signUp: async () => null,
   signOut: async () => {},
 });
 
@@ -40,8 +40,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      setUser(authUser);
       setLoading(false);
     });
 
@@ -52,8 +52,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     await signInWithEmailAndPassword(auth, email, password);
   };
 
-  const signUp = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password);
+  const signUp = async (email: string, password: string): Promise<User | null> => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
   };
 
   const signOut = async () => {

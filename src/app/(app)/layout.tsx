@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth';
 import { AdminSidebar } from '@/components/sidebar';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { getUserThunk, loadWorkflowsThunk, loadExecutionsThunk } from '@/store/thunks';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -11,15 +13,61 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const dispatch = useAppDispatch();
+  const { user: authUser, loading: authLoading } = useAuth();
+  const currentUser = useAppSelector((state) => state.currentUser);
+  const [userLoading, setUserLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
 
+  // Redirect to login if not authenticated
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !authUser) {
       router.push('/login');
     }
-  }, [user, loading, router]);
+  }, [authUser, authLoading, router]);
 
-  // Show loading state while checking auth
+  // Fetch user document when auth user is available
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (authUser && !currentUser.id) {
+        setUserLoading(true);
+        await dispatch(getUserThunk(authUser.uid));
+        setUserLoading(false);
+      } else if (!authUser) {
+        setUserLoading(false);
+      } else {
+        setUserLoading(false);
+      }
+    };
+
+    if (!authLoading) {
+      fetchUser();
+    }
+  }, [authUser, authLoading, currentUser.id, dispatch]);
+
+  // Load app data (workflows, executions) when authenticated
+  useEffect(() => {
+    const loadData = async () => {
+      if (authUser) {
+        setDataLoading(true);
+        await Promise.all([
+          dispatch(loadWorkflowsThunk(authUser.uid)),
+          dispatch(loadExecutionsThunk(authUser.uid)),
+        ]);
+        setDataLoading(false);
+      } else {
+        setDataLoading(false);
+      }
+    };
+
+    if (!authLoading) {
+      loadData();
+    }
+  }, [authUser, authLoading, dispatch]);
+
+  const loading = authLoading || userLoading || dataLoading;
+
+  // Show loading state while checking auth or fetching user
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
@@ -29,7 +77,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   // Don't render anything if not authenticated (will redirect)
-  if (!user) {
+  if (!authUser) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner} />

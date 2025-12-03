@@ -5,11 +5,11 @@ import { getAllWorkflowExecutions, getAllWorkflowResponses } from '@/api';
 
 type ResponseType = Promise<200 | 400 | 500>;
 
-export const loadExecutionsThunk = (): AppThunk<ResponseType> => {
+export const loadExecutionsThunk = (userId: string): AppThunk<ResponseType> => {
   return async (dispatch): ResponseType => {
     try {
       // Load executions
-      const executionsResponse = await getAllWorkflowExecutions();
+      const executionsResponse = await getAllWorkflowExecutions(userId);
 
       if (!executionsResponse.success || !executionsResponse.data) {
         console.error('Failed to load executions:', executionsResponse.error);
@@ -24,7 +24,7 @@ export const loadExecutionsThunk = (): AppThunk<ResponseType> => {
       dispatch(WorkflowExecutionsActions.setWorkflowExecutions(executionsMap));
 
       // Load responses
-      const responsesResponse = await getAllWorkflowResponses();
+      const responsesResponse = await getAllWorkflowResponses(userId);
 
       if (!responsesResponse.success || !responsesResponse.data) {
         console.error('Failed to load responses:', responsesResponse.error);

@@ -4,7 +4,11 @@ import {
   workflowExecutionsReducer,
   workflowResponsesReducer,
 } from './dumps';
-import { currentWorkflowReducer, currentWorkflowExecutionReducer } from './current';
+import {
+  currentUserReducer,
+  currentWorkflowReducer,
+  currentWorkflowExecutionReducer,
+} from './current';
 import { workflowBuilderReducer } from './builders';
 
 const rootReducer = combineReducers({
@@ -14,6 +18,7 @@ const rootReducer = combineReducers({
   workflowResponses: workflowResponsesReducer,
 
   // Current
+  currentUser: currentUserReducer,
   currentWorkflow: currentWorkflowReducer,
   currentWorkflowExecution: currentWorkflowExecutionReducer,
 

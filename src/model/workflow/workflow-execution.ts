@@ -4,6 +4,7 @@ export type ExecutionStatus = 'pending' | 'success' | 'error';
 
 export interface WorkflowExecution {
   id: string;
+  userId: string;
   workflowId: string;
   responseId: string | null;
   requestUrl: string;

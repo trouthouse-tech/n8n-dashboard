@@ -6,6 +6,7 @@ export interface WorkflowBodyParam {
 
 export interface Workflow {
   id: string;
+  userId: string;
   name: string;
   description: string;
   webhookUrl: string;

@@ -24,8 +24,13 @@ interface TriggerResult {
 export const triggerWorkflowThunk = (
   params: TriggerParams
 ): AppThunk<Promise<TriggerResult>> => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     const { workflowId, webhookUrl, bodyParams } = params;
+    const userId = getState().currentUser.id;
+
+    if (!userId) {
+      return { status: 400, error: 'No user ID found' };
+    }
 
     dispatch(WorkflowBuilderActions.setIsExecuting(true));
 
@@ -33,6 +38,7 @@ export const triggerWorkflowThunk = (
 
     // Create execution record in Firebase (pending status)
     const executionResponse = await createWorkflowExecution({
+      userId,
       workflowId,
       responseId: null,
       requestUrl: webhookUrl,
@@ -82,6 +88,7 @@ export const triggerWorkflowThunk = (
           : JSON.stringify(result.data, null, 2);
 
       const responseResponse = await createWorkflowResponse({
+        userId,
         executionId: execution.id,
         raw: rawResponse,
         receivedAt: new Date().toISOString(),

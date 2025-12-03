@@ -1,4 +1,5 @@
 export enum FIRESTORE_COLLECTIONS {
+  USERS = 'users',
   WORKFLOWS = 'workflows',
   WORKFLOW_EXECUTIONS = 'workflowExecutions',
   WORKFLOW_RESPONSES = 'workflowResponses',

@@ -5,10 +5,10 @@ import { getAllWorkflows } from '@/api';
 
 type ResponseType = Promise<200 | 400 | 500>;
 
-export const loadWorkflowsThunk = (): AppThunk<ResponseType> => {
+export const loadWorkflowsThunk = (userId: string): AppThunk<ResponseType> => {
   return async (dispatch): ResponseType => {
     try {
-      const response = await getAllWorkflows();
+      const response = await getAllWorkflows(userId);
 
       if (!response.success || !response.data) {
         console.error('Failed to load workflows:', response.error);

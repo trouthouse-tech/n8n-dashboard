@@ -41,7 +41,7 @@ export default function LandingPage() {
               </Link>
             ) : (
               <>
-                <Link href="/login" className={styles.ctaPrimary}>
+                <Link href="/signup" className={styles.ctaPrimary}>
                   Get Started
                   <span className={styles.ctaArrow}>→</span>
                 </Link>
