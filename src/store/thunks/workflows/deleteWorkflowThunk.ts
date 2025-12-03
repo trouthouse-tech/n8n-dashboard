@@ -1,19 +1,24 @@
 import { AppThunk } from '../../types';
 import { WorkflowsActions } from '../../dumps';
+import { deleteWorkflow } from '@/api';
 
-const STORAGE_KEY = 'n8n-workflows';
+type ResponseType = Promise<200 | 400 | 500>;
 
-export const deleteWorkflowThunk = (workflowId: string): AppThunk<void> => {
-  return (dispatch, getState) => {
+export const deleteWorkflowThunk = (workflowId: string): AppThunk<ResponseType> => {
+  return async (dispatch): ResponseType => {
     try {
-      dispatch(WorkflowsActions.deleteWorkflow(workflowId));
+      const response = await deleteWorkflow(workflowId);
 
-      // Persist to localStorage
-      const workflows = getState().workflows;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(workflows));
+      if (!response.success) {
+        console.error('Failed to delete workflow:', response.error);
+        return 400;
+      }
+
+      dispatch(WorkflowsActions.deleteWorkflow(workflowId));
+      return 200;
     } catch (error) {
       console.error('Error deleting workflow:', error);
+      return 500;
     }
   };
 };
-

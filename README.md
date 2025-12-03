@@ -36,12 +36,28 @@ A personal dashboard to trigger and manage N8N workflows via webhooks. Built wit
    npm install
    ```
 
-3. Start the development server:
+3. Set up Firebase (optional but recommended):
+   
+   Create a `.env.local` file with your Firebase configuration:
+   ```bash
+   # Firebase Configuration
+   NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-your-measurement-id
+   ```
+
+   Get these values from: [Firebase Console](https://console.firebase.google.com/) > Project Settings > Your apps > Firebase SDK snippet
+
+4. Start the development server:
    ```bash
    npm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Usage
 
@@ -74,7 +90,8 @@ A personal dashboard to trigger and manage N8N workflows via webhooks. Built wit
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **Storage**: Browser localStorage
+- **Backend**: [Firebase](https://firebase.google.com/) (Firestore, Auth, Functions)
+- **Storage**: Browser localStorage (with Firebase sync)
 
 ## Project Structure
 
@@ -85,6 +102,8 @@ src/
 │   ├── workflow/[id]/      # Workflow detail page
 │   └── workflow-execution/[id]/  # Execution detail page
 ├── components/             # Shared components
+├── lib/                    # Utilities and services
+│   └── firebase/           # Firebase configuration & providers
 ├── model/                  # TypeScript type definitions
 ├── packages/               # Feature components
 │   ├── workflow-list/      # Workflow list & modal

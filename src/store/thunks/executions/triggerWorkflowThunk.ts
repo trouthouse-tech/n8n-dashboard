@@ -1,10 +1,12 @@
 import { AppThunk } from '../../types';
 import { WorkflowExecutionsActions, WorkflowResponsesActions } from '../../dumps';
 import { WorkflowBuilderActions } from '../../builders';
-import { WorkflowBodyParam, WorkflowExecution, WorkflowResponse } from '../../../model';
-
-const EXECUTIONS_STORAGE_KEY = 'n8n-workflow-executions';
-const RESPONSES_STORAGE_KEY = 'n8n-workflow-responses';
+import { WorkflowBodyParam, WorkflowExecution, WorkflowResponse } from '@/model';
+import {
+  createWorkflowExecution,
+  updateWorkflowExecution,
+  createWorkflowResponse,
+} from '@/api';
 
 interface TriggerParams {
   workflowId: string;
@@ -14,6 +16,7 @@ interface TriggerParams {
 
 interface TriggerResult {
   status: 200 | 400 | 500;
+  executionId?: string;
   responseId?: string;
   error?: string;
 }
@@ -21,17 +24,15 @@ interface TriggerResult {
 export const triggerWorkflowThunk = (
   params: TriggerParams
 ): AppThunk<Promise<TriggerResult>> => {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     const { workflowId, webhookUrl, bodyParams } = params;
 
     dispatch(WorkflowBuilderActions.setIsExecuting(true));
 
-    const executionId = crypto.randomUUID();
     const now = new Date().toISOString();
 
-    // Create execution record
-    const execution: WorkflowExecution = {
-      id: executionId,
+    // Create execution record in Firebase (pending status)
+    const executionResponse = await createWorkflowExecution({
       workflowId,
       responseId: null,
       requestUrl: webhookUrl,
@@ -39,8 +40,15 @@ export const triggerWorkflowThunk = (
       status: 'pending',
       errorMessage: null,
       executedAt: now,
-    };
+    });
 
+    if (!executionResponse.success || !executionResponse.data) {
+      console.error('Failed to create execution:', executionResponse.error);
+      dispatch(WorkflowBuilderActions.setIsExecuting(false));
+      return { status: 400, error: 'Failed to create execution record' };
+    }
+
+    const execution = executionResponse.data as WorkflowExecution;
     dispatch(WorkflowExecutionsActions.addWorkflowExecution(execution));
 
     try {
@@ -52,7 +60,7 @@ export const triggerWorkflowThunk = (
         }
       });
 
-      // Call the API route
+      // Call the API route to trigger the webhook
       const res = await fetch('/api/trigger-webhook', {
         method: 'POST',
         headers: {
@@ -67,56 +75,65 @@ export const triggerWorkflowThunk = (
         throw new Error(result.error || `HTTP error! status: ${res.status}`);
       }
 
-      // Create response record
-      const responseId = crypto.randomUUID();
+      // Create response record in Firebase
       const rawResponse =
         typeof result.data === 'string'
           ? result.data
           : JSON.stringify(result.data, null, 2);
 
-      const response: WorkflowResponse = {
-        id: responseId,
-        executionId,
+      const responseResponse = await createWorkflowResponse({
+        executionId: execution.id,
         raw: rawResponse,
         receivedAt: new Date().toISOString(),
-      };
+      });
 
-      dispatch(WorkflowResponsesActions.addWorkflowResponse(response));
+      if (!responseResponse.success || !responseResponse.data) {
+        console.error('Failed to create response:', responseResponse.error);
+        throw new Error('Failed to save response');
+      }
 
-      // Update execution with success
-      const updatedExecution: WorkflowExecution = {
-        ...execution,
-        responseId,
+      const workflowResponse = responseResponse.data as WorkflowResponse;
+      dispatch(WorkflowResponsesActions.addWorkflowResponse(workflowResponse));
+
+      // Update execution with success status and response ID
+      const updateResponse = await updateWorkflowExecution(execution.id, {
+        responseId: workflowResponse.id,
         status: 'success',
-      };
-      dispatch(WorkflowExecutionsActions.updateWorkflowExecution(updatedExecution));
+      });
 
-      // Persist to localStorage
-      const executions = getState().workflowExecutions;
-      const responses = getState().workflowResponses;
-      localStorage.setItem(EXECUTIONS_STORAGE_KEY, JSON.stringify(executions));
-      localStorage.setItem(RESPONSES_STORAGE_KEY, JSON.stringify(responses));
+      if (updateResponse.success && updateResponse.data) {
+        dispatch(
+          WorkflowExecutionsActions.updateWorkflowExecution(
+            updateResponse.data as WorkflowExecution
+          )
+        );
+      }
 
       dispatch(WorkflowBuilderActions.setIsExecuting(false));
-      return { status: 200, responseId };
+      return {
+        status: 200,
+        executionId: execution.id,
+        responseId: workflowResponse.id,
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-      // Update execution with error
-      const updatedExecution: WorkflowExecution = {
-        ...execution,
+      // Update execution with error status
+      const updateResponse = await updateWorkflowExecution(execution.id, {
         status: 'error',
         errorMessage,
-      };
-      dispatch(WorkflowExecutionsActions.updateWorkflowExecution(updatedExecution));
+      });
 
-      // Persist to localStorage
-      const executions = getState().workflowExecutions;
-      localStorage.setItem(EXECUTIONS_STORAGE_KEY, JSON.stringify(executions));
+      if (updateResponse.success && updateResponse.data) {
+        dispatch(
+          WorkflowExecutionsActions.updateWorkflowExecution(
+            updateResponse.data as WorkflowExecution
+          )
+        );
+      }
 
       dispatch(WorkflowBuilderActions.setIsExecuting(false));
-      return { status: 500, error: errorMessage };
+      return { status: 500, executionId: execution.id, error: errorMessage };
     }
   };
 };
-
