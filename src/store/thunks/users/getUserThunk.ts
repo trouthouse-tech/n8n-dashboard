@@ -11,7 +11,7 @@ export const getUserThunk = (uid: string): AppThunk<ResponseType> => {
       const response = await getUserById(uid);
 
       if (!response.success) {
-        console.error('Failed to get user:', response.error);
+        // User not found is expected for new local users
         return { status: 404 };
       }
 
@@ -29,4 +29,3 @@ export const getUserThunk = (uid: string): AppThunk<ResponseType> => {
     }
   };
 };
-

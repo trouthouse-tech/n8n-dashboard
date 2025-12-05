@@ -1,3 +1,2 @@
-export * from "./firebase";
+export * from "./storage";
 export * from "./n8n";
-

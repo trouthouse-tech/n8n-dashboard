@@ -2,14 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/auth';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { createUserThunk } from '@/store/thunks';
 import { CurrentUserActions } from '@/store/current';
+import { useApp } from '@/context/app';
 import { isOtherIndustry } from '@/model';
 import {
   EmailInput,
-  PasswordInput,
   NameInput,
   CompanyNameInput,
   IndustryInput,
@@ -19,11 +18,9 @@ import {
 export const SignUpForm = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { signUp } = useAuth();
+  const { completeOnboarding } = useApp();
   const currentUser = useAppSelector((state) => state.currentUser);
 
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -44,18 +41,6 @@ export const SignUpForm = () => {
       setError('Please describe your industry');
       return false;
     }
-    if (!password) {
-      setError('Password is required');
-      return false;
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return false;
-    }
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return false;
-    }
     return true;
   };
 
@@ -70,34 +55,21 @@ export const SignUpForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Create Firebase auth user
-      const authUser = await signUp(currentUser.email, password);
-
-      if (!authUser) {
-        setError('Failed to create account');
-        return;
-      }
-
-      // Create user document in Firestore
-      const result = await dispatch(createUserThunk(authUser.uid));
+      // Create user in local storage
+      const result = await dispatch(createUserThunk());
 
       if (result.status !== 200) {
         setError('Failed to create user profile');
         return;
       }
 
-      router.push('/welcome');
+      // Mark onboarding as complete
+      completeOnboarding();
+
+      router.push('/workflows');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-      if (errorMessage.includes('auth/email-already-in-use')) {
-        setError('Email already in use');
-      } else if (errorMessage.includes('auth/weak-password')) {
-        setError('Password should be at least 6 characters');
-      } else if (errorMessage.includes('auth/invalid-email')) {
-        setError('Invalid email address');
-      } else {
-        setError(errorMessage);
-      }
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -122,20 +94,6 @@ export const SignUpForm = () => {
       <IndustryInput />
       <IndustryOtherInput />
 
-      <PasswordInput
-        value={password}
-        onChange={setPassword}
-        id="password"
-        label="Password"
-      />
-
-      <PasswordInput
-        value={confirmPassword}
-        onChange={setConfirmPassword}
-        id="confirmPassword"
-        label="Confirm Password"
-      />
-
       <button
         type="submit"
         disabled={isSubmitting}
@@ -144,7 +102,7 @@ export const SignUpForm = () => {
         {isSubmitting ? (
           <div className={styles.buttonSpinner} />
         ) : (
-          'Create Account'
+          'Get Started'
         )}
       </button>
     </form>
@@ -171,4 +129,3 @@ const styles = {
     rounded-full animate-spin
   `,
 };
-

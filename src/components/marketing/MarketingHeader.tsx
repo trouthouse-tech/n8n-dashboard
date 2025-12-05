@@ -1,11 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuth } from '@/context/auth';
 
 export const MarketingHeader = () => {
-  const { user, loading } = useAuth();
-
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -15,17 +12,9 @@ export const MarketingHeader = () => {
         </Link>
 
         <nav className={styles.nav}>
-          {loading ? (
-            <div className={styles.loadingDot} />
-          ) : user ? (
-            <Link href="/welcome" className={styles.openAppButton}>
-              Open App
-            </Link>
-          ) : (
-            <Link href="/login" className={styles.loginButton}>
-              Login
-            </Link>
-          )}
+          <Link href="/welcome" className={styles.openAppButton}>
+            Open App
+          </Link>
         </nav>
       </div>
     </header>
@@ -54,17 +43,9 @@ const styles = {
   nav: `
     flex items-center gap-4
   `,
-  loginButton: `
-    px-4 py-2 text-sm font-medium text-gray-600
-    hover:text-gray-900 transition-colors
-  `,
   openAppButton: `
     px-4 py-2 text-sm font-medium
     bg-blue-600 text-white rounded
     hover:bg-blue-700 transition-colors
   `,
-  loadingDot: `
-    w-2 h-2 bg-gray-300 rounded-full animate-pulse
-  `,
 };
-

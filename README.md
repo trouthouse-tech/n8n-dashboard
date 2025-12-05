@@ -2,6 +2,8 @@
 
 A personal dashboard to trigger and manage N8N workflows via webhooks. Built with Next.js, React, Redux, and Tailwind CSS.
 
+**100% Local Storage** — No account required. All data is stored in your browser's localStorage.
+
 ![N8N Workflow Dashboard](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![Redux](https://img.shields.io/badge/Redux-Toolkit-purple?style=flat-square&logo=redux)
@@ -13,7 +15,7 @@ A personal dashboard to trigger and manage N8N workflows via webhooks. Built wit
 - **Webhook Triggering** — Trigger N8N workflows and view responses in real-time
 - **Execution History** — Track all workflow executions with status and response data
 - **Response Parsing** — JSON responses are parsed and displayed in a structured tree view
-- **Cloud Persistence** — Workflows, executions, and responses are stored per user in Firebase
+- **Local Persistence** — All data stored locally in your browser - no account needed
 - **Portrait-Optimized UI** — Designed for vertical/portrait displays
 
 ## Getting Started
@@ -36,28 +38,14 @@ A personal dashboard to trigger and manage N8N workflows via webhooks. Built wit
    npm install
    ```
 
-3. Set up Firebase (optional but recommended):
-   
-   Create a `.env.local` file with your Firebase configuration:
-   ```bash
-   # Firebase Configuration
-   NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
-   NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
-   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-your-measurement-id
-   ```
-
-   Get these values from: [Firebase Console](https://console.firebase.google.com/) > Project Settings > Your apps > Firebase SDK snippet
-
-4. Start the development server:
+3. Start the development server:
    ```bash
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+That's it! No environment variables or backend setup required.
 
 ## Usage
 
@@ -90,39 +78,38 @@ A personal dashboard to trigger and manage N8N workflows via webhooks. Built wit
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **Backend**: [Firebase](https://firebase.google.com/) (Firestore, Auth, Functions)
-- **Data**: Firebase Firestore (per-user collections)
+- **Persistence**: Browser localStorage (no backend required)
 
 ## Architecture Overview
 
-- **Next.js App Router** — Marketing/auth pages at the root; authenticated experience lives under `app/(app)`
-- **Feature Packages** — UI is organized by feature in `src/packages` (workflow list/detail, execution detail, workflow modal, signup)
+- **Next.js App Router** — Landing page at root; main app lives under `app/(app)`
+- **Feature Packages** — UI organized by feature in `src/packages` (workflow list/detail, execution detail, workflow modal, signup)
 - **Redux Toolkit Store** — `builders` (UI flags), `current` (selected entities), and `dumps` (collections) hydrated via async thunks
-- **API Layer** — `src/api/firestore` wraps Firestore CRUD for workflows, executions, responses, and users; webhook calls proxy through `app/api/trigger-webhook`
+- **API Layer** — `src/api/service` provides localStorage-backed CRUD for workflows, executions, responses, and users; webhook calls proxy through `app/api/trigger-webhook`
 - **N8N Parsing** — `src/lib/n8n` handles workflow parsing, validation, and extraction helpers
-- **Shared UI** — Layout, navigation, and marketing components live in `src/components`; auth context is in `src/context/auth`
+- **Shared UI** — Layout, navigation, and marketing components in `src/components`; app context in `src/context/app`
 
 ## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── layout.tsx          # Root shell (marketing/auth)
+│   ├── layout.tsx          # Root shell
 │   ├── page.tsx            # Marketing landing
-│   ├── login/ | signup/    # Auth pages
+│   ├── signup/             # Optional profile setup
 │   ├── api/trigger-webhook # Proxy to call N8N webhook
-│   └── (app)/              # Authenticated shell
+│   └── (app)/              # Main app shell
 │       ├── layout.tsx
 │       ├── workflows/                  # Workflow list page
 │       ├── workflow/[id]/              # Workflow detail page
 │       ├── workflow-execution/[id]/    # Execution detail page
 │       └── welcome/                    # Onboarding
 ├── api/
-│   └── firestore/          # Firestore services, mutators, retrievers
+│   └── service/            # localStorage-backed services
 ├── components/             # Shared layout/navigation/marketing UI
-├── context/                # Auth context + hook
+├── context/                # App context + hook
 ├── lib/
-│   ├── firebase/           # Firebase config
+│   ├── storage/            # localStorage utilities
 │   └── n8n/                # Workflow parsing, validators, extractors
 ├── model/                  # Domain types
 ├── packages/               # Feature modules (one component/hook per file)
@@ -130,21 +117,32 @@ src/
 │   ├── workflow-detail/            # Detail view, steps, triggers, history
 │   ├── workflow-modal/             # Creation/import modal
 │   ├── workflow-execution-detail/  # Response & execution details
-│   └── signup/                     # Signup form + inputs
+│   └── signup/                     # Profile setup form + inputs
 ├── store/                  # Redux store configuration
 │   ├── builders/           # UI state slices
 │   ├── current/            # Current entity slices
 │   ├── dumps/              # Cached collections
-│   └── thunks/             # Async calls to Firestore + webhook proxy
+│   └── thunks/             # Async calls to localStorage + webhook proxy
 └── app/globals.css         # Global Tailwind setup
 ```
 
 ## How It Works
 
-1. **Workflows** are saved per user in Firebase Firestore with webhook URL, defaults, agent prompts, and path steps
+1. **Workflows** are saved in browser localStorage with webhook URL, defaults, agent prompts, and path steps
 2. Triggering a workflow sends the request through the `api/trigger-webhook` route to avoid CORS issues
-3. Executions and responses are written to Firestore and hydrated into Redux via thunks
-4. UI reads from Redux selectors; Firestore is the source of truth for persistence
+3. Executions and responses are written to localStorage and hydrated into Redux via thunks
+4. UI reads from Redux selectors; localStorage is the persistence layer
+
+## Data Storage
+
+All data is stored in your browser's localStorage under these keys:
+- `n8n_workflows` — Your workflow configurations
+- `n8n_workflow_executions` — Execution history
+- `n8n_workflow_responses` — Webhook responses
+- `n8n_user` — Your profile (optional)
+- `n8n_app_state` — App state (onboarding completion, etc.)
+
+To reset all data, use the "Reset App" button in the sidebar, or clear your browser's localStorage.
 
 ## N8N Webhook Setup
 

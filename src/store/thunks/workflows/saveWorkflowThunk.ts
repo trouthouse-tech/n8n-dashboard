@@ -10,11 +10,8 @@ export const saveWorkflowThunk = (
 ): AppThunk<ResponseType> => {
   return async (dispatch, getState): ResponseType => {
     try {
-      const userId = getState().currentUser.id;
-      if (!userId) {
-        console.error('No user ID found');
-        return { status: 400 };
-      }
+      // Use local-user as default userId for local storage
+      const userId = getState().currentUser.id || 'local-user';
 
       const isNew = !workflow.id || !getState().workflows[workflow.id];
 

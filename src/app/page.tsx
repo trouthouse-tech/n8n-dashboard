@@ -1,12 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuth } from '@/context/auth';
 import { MarketingHeader } from '@/components/marketing';
 
 export default function LandingPage() {
-  const { user, loading } = useAuth();
-
   return (
     <div className={styles.page}>
       <MarketingHeader />
@@ -27,29 +24,15 @@ export default function LandingPage() {
           <p className={styles.heroDescription}>
             A personal dashboard to trigger N8N workflows via webhooks.
             Build custom request bodies, track executions, and view responses in real-time.
+            <br />
+            <span className={styles.localBadge}>100% Local Storage - No Account Required</span>
           </p>
 
           <div className={styles.ctaContainer}>
-            {loading ? (
-              <div className={styles.ctaLoading}>
-                <div className={styles.spinner} />
-              </div>
-            ) : user ? (
-              <Link href="/welcome" className={styles.ctaPrimary}>
-                Open Dashboard
-                <span className={styles.ctaArrow}>→</span>
-              </Link>
-            ) : (
-              <>
-                <Link href="/signup" className={styles.ctaPrimary}>
-                  Get Started
-                  <span className={styles.ctaArrow}>→</span>
-                </Link>
-                <Link href="/login" className={styles.ctaSecondary}>
-                  Sign In
-                </Link>
-              </>
-            )}
+            <Link href="/welcome" className={styles.ctaPrimary}>
+              Open Dashboard
+              <span className={styles.ctaArrow}>→</span>
+            </Link>
           </div>
         </div>
 
@@ -82,7 +65,7 @@ export default function LandingPage() {
 
       <footer className={styles.footer}>
         <p className={styles.footerText}>
-          Built for personal automation workflows
+          Built for personal automation workflows • Data stored locally in your browser
         </p>
       </footer>
     </div>
@@ -124,15 +107,11 @@ const styles = {
     max-w-lg mx-auto
     mb-8
   `,
+  localBadge: `
+    block mt-3 text-sm text-green-600 font-medium
+  `,
   ctaContainer: `
     flex items-center justify-center gap-4
-  `,
-  ctaLoading: `
-    h-12 flex items-center justify-center
-  `,
-  spinner: `
-    w-5 h-5 border-2 border-gray-200 border-t-blue-600
-    rounded-full animate-spin
   `,
   ctaPrimary: `
     inline-flex items-center gap-2 px-6 py-3
@@ -141,10 +120,6 @@ const styles = {
   `,
   ctaArrow: `
     text-lg
-  `,
-  ctaSecondary: `
-    px-6 py-3 text-gray-500 font-medium
-    hover:text-gray-900 transition-colors
   `,
   featuresSection: `
     max-w-4xl mx-auto mt-24

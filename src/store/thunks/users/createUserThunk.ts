@@ -2,16 +2,18 @@ import { AppThunk } from '../../types';
 import { CurrentUserActions } from '../../current';
 import { User } from '@/model';
 import { createUser } from '@/api';
+import { generateId } from '@/lib/storage';
 
 type ResponseType = Promise<{ status: 200 | 400 | 500; user?: User }>;
 
-export const createUserThunk = (uid: string): AppThunk<ResponseType> => {
+export const createUserThunk = (uid?: string): AppThunk<ResponseType> => {
   return async (dispatch, getState): ResponseType => {
     try {
       const currentUser = getState().currentUser;
+      const userId = uid || generateId();
 
       const user: Omit<User, 'createdAt' | 'updatedAt'> = {
-        id: uid,
+        id: userId,
         email: currentUser.email,
         name: currentUser.name,
         companyName: currentUser.companyName,

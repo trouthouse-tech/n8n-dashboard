@@ -1,7 +1,7 @@
 {
   "name": "n8n-workflow-dashboard",
   "version": "1.0.0",
-  "description": "A personal dashboard to trigger and manage N8N workflows via webhooks",
+  "description": "A personal dashboard to trigger and manage N8N workflows via webhooks - local storage only, no account required",
   "author": "Matt Ruiz",
   "license": "MIT",
   "repository": {
@@ -16,7 +16,8 @@
     "automation",
     "nextjs",
     "react",
-    "redux"
+    "redux",
+    "local-storage"
   ],
   "scripts": {
     "dev": "next dev",
@@ -26,7 +27,6 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.0",
-    "firebase": "^12.6.0",
     "next": "16.0.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",

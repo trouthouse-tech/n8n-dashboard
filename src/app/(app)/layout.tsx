@@ -1,82 +1,42 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/auth';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { getUserThunk, loadWorkflowsThunk, loadExecutionsThunk } from '@/store/thunks';
+import { loadWorkflowsThunk, loadExecutionsThunk } from '@/store/thunks';
+import { useApp } from '@/context/app';
 
-interface AuthLayoutProps {
+interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-export default function AuthLayout({ children }: AuthLayoutProps) {
-  const router = useRouter();
+export default function AppLayout({ children }: AppLayoutProps) {
   const dispatch = useAppDispatch();
-  const { user: authUser, loading: authLoading } = useAuth();
+  const { isInitialized } = useApp();
   const currentUser = useAppSelector((state) => state.currentUser);
-  const [userLoading, setUserLoading] = useState(true);
   const [dataLoading, setDataLoading] = useState(true);
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !authUser) {
-      router.push('/login');
-    }
-  }, [authUser, authLoading, router]);
-
-  // Fetch user document when auth user is available
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (authUser && !currentUser.id) {
-        setUserLoading(true);
-        await dispatch(getUserThunk(authUser.uid));
-        setUserLoading(false);
-      } else if (!authUser) {
-        setUserLoading(false);
-      } else {
-        setUserLoading(false);
-      }
-    };
-
-    if (!authLoading) {
-      fetchUser();
-    }
-  }, [authUser, authLoading, currentUser.id, dispatch]);
-
-  // Load app data (workflows, executions) when authenticated
+  // Load app data (workflows, executions) on mount
   useEffect(() => {
     const loadData = async () => {
-      if (authUser) {
-        setDataLoading(true);
-        await Promise.all([
-          dispatch(loadWorkflowsThunk(authUser.uid)),
-          dispatch(loadExecutionsThunk(authUser.uid)),
-        ]);
-        setDataLoading(false);
-      } else {
-        setDataLoading(false);
-      }
+      if (!isInitialized) return;
+      
+      setDataLoading(true);
+      // Use a default local user ID since we're not using auth
+      const userId = currentUser.id || 'local-user';
+      await Promise.all([
+        dispatch(loadWorkflowsThunk(userId)),
+        dispatch(loadExecutionsThunk(userId)),
+      ]);
+      setDataLoading(false);
     };
 
-    if (!authLoading) {
-      loadData();
-    }
-  }, [authUser, authLoading, dispatch]);
+    loadData();
+  }, [isInitialized, currentUser.id, dispatch]);
 
-  const loading = authLoading || userLoading || dataLoading;
+  const loading = !isInitialized || dataLoading;
 
-  // Show loading state while checking auth or fetching user
+  // Show loading state while initializing
   if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner} />
-      </div>
-    );
-  }
-
-  // Don't render anything if not authenticated (will redirect)
-  if (!authUser) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner} />

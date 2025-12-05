@@ -26,17 +26,14 @@ export const triggerWorkflowThunk = (
 ): AppThunk<Promise<TriggerResult>> => {
   return async (dispatch, getState) => {
     const { workflowId, webhookUrl, bodyParams } = params;
-    const userId = getState().currentUser.id;
-
-    if (!userId) {
-      return { status: 400, error: 'No user ID found' };
-    }
+    // Use local-user as default userId for local storage
+    const userId = getState().currentUser.id || 'local-user';
 
     dispatch(WorkflowBuilderActions.setIsExecuting(true));
 
     const now = new Date().toISOString();
 
-    // Create execution record in Firebase (pending status)
+    // Create execution record (pending status)
     const executionResponse = await createWorkflowExecution({
       userId,
       workflowId,
@@ -81,7 +78,7 @@ export const triggerWorkflowThunk = (
         throw new Error(result.error || `HTTP error! status: ${res.status}`);
       }
 
-      // Create response record in Firebase
+      // Create response record
       const rawResponse =
         typeof result.data === 'string'
           ? result.data

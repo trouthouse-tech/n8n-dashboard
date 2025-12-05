@@ -1,32 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/context/auth';
 import { SignUpForm } from '@/packages/signup';
 
-export default function SignUpPage() {
-  const router = useRouter();
-  const { user, loading } = useAuth();
-
-  // Redirect if already logged in
-  useEffect(() => {
-    if (!loading && user) {
-      router.push('/welcome');
-    }
-  }, [user, loading, router]);
-
-  if (loading || user) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.loadingContainer}>
-          <div className={styles.spinner} />
-        </div>
-      </div>
-    );
-  }
-
+export default function SignupPage() {
   return (
     <div className={styles.page}>
       <div className={styles.container}>
@@ -37,20 +14,17 @@ export default function SignUpPage() {
         <div className={styles.card}>
           <div className={styles.header}>
             <div className={styles.logoMark}>⚡</div>
-            <h1 className={styles.title}>Create Account</h1>
+            <h1 className={styles.title}>Set Up Your Profile</h1>
             <p className={styles.subtitle}>
-              Sign up to start managing your workflows
+              Tell us a bit about yourself to personalize your experience
             </p>
           </div>
 
           <SignUpForm />
 
-          <div className={styles.toggleSection}>
-            <p className={styles.toggleText}>Already have an account?</p>
-            <Link href="/login" className={styles.toggleButton}>
-              Sign In
-            </Link>
-          </div>
+          <p className={styles.footerNote}>
+            Your data is stored locally in your browser. No account required.
+          </p>
         </div>
       </div>
     </div>
@@ -62,13 +36,6 @@ const styles = {
     min-h-screen bg-gray-50
     flex items-center justify-center
     px-4 py-12
-  `,
-  loadingContainer: `
-    flex items-center justify-center
-  `,
-  spinner: `
-    w-8 h-8 border-2 border-gray-200 border-t-blue-600
-    rounded-full animate-spin
   `,
   container: `
     w-full max-w-md
@@ -93,16 +60,8 @@ const styles = {
   subtitle: `
     text-gray-500 text-sm
   `,
-  toggleSection: `
+  footerNote: `
     mt-6 pt-6 border-t border-gray-200
-    flex items-center justify-center gap-2
-  `,
-  toggleText: `
-    text-sm text-gray-500
-  `,
-  toggleButton: `
-    text-sm text-blue-600 font-medium
-    hover:text-blue-700 transition-colors
+    text-xs text-gray-400 text-center
   `,
 };
-

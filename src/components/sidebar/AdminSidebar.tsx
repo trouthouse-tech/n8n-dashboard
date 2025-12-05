@@ -1,17 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname }from 'next/navigation';
 import { useState } from 'react';
 import { getNavigationLinks } from '../navigation';
 import type { NavigationLink } from '../navigation';
-import { useAuth } from '@/context/auth';
 import { useAppSelector } from '@/store/hooks';
+import { useApp } from '@/context/app';
 
 export const AdminSidebar = () => {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, signOut } = useAuth();
+  const { resetApp } = useApp();
+  const currentUser = useAppSelector((state) => state.currentUser);
   const navigationLinks = getNavigationLinks();
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const isHidden = useAppSelector((state) => state.layoutBuilder.isSidebarCollapsed);
@@ -42,9 +42,11 @@ export const AdminSidebar = () => {
     });
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push('/');
+  const handleReset = () => {
+    if (window.confirm('This will clear all local data. Are you sure?')) {
+      resetApp();
+      window.location.href = '/';
+    }
   };
 
   const resolveLinkClassName = (href: string, isChild = false): string => {
@@ -116,6 +118,10 @@ export const AdminSidebar = () => {
     );
   };
 
+  // Get display name from current user or show default
+  const displayName = currentUser.name || currentUser.email || 'Local User';
+  const displayInitial = displayName.charAt(0).toUpperCase();
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.inner}>
@@ -133,17 +139,17 @@ export const AdminSidebar = () => {
         <div className={styles.footer}>
           <div className={styles.userInfo}>
             <div className={styles.userAvatar}>
-              {user?.email?.charAt(0).toUpperCase() || '?'}
+              {displayInitial}
             </div>
             <span className={styles.userEmail}>
-              {user?.email || 'Unknown'}
+              {displayName}
             </span>
           </div>
           <button
-            onClick={handleSignOut}
+            onClick={handleReset}
             className={styles.signOutButton}
           >
-            Sign Out
+            Reset App
           </button>
         </div>
       </div>

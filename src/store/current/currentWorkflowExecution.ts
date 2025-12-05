@@ -3,6 +3,7 @@ import { WorkflowExecution } from '../../model';
 
 const initialState: WorkflowExecution = {
   id: '',
+  userId: '',
   workflowId: '',
   responseId: null,
   requestUrl: '',
