@@ -137,7 +137,7 @@ export default function LoginPage() {
 
 const styles = {
   page: `
-    min-h-screen bg-slate-900
+    min-h-screen bg-gray-50
     flex items-center justify-center
     px-4 py-12
   `,
@@ -145,19 +145,19 @@ const styles = {
     flex items-center justify-center
   `,
   spinner: `
-    w-8 h-8 border-2 border-slate-700 border-t-amber-500
+    w-8 h-8 border-2 border-gray-200 border-t-blue-600
     rounded-full animate-spin
   `,
   container: `
     w-full max-w-md
   `,
   backLink: `
-    inline-block mb-6 text-sm text-slate-500
-    hover:text-slate-300 transition-colors
+    inline-block mb-6 text-sm text-gray-500
+    hover:text-gray-700 transition-colors
   `,
   card: `
-    bg-slate-800 border border-slate-700 rounded-2xl
-    p-8
+    bg-white border border-gray-300 rounded-lg
+    p-8 shadow-sm
   `,
   header: `
     text-center mb-8
@@ -166,50 +166,50 @@ const styles = {
     text-4xl mb-4
   `,
   title: `
-    text-2xl font-bold text-white mb-2
+    text-2xl font-bold text-gray-900 mb-2
   `,
   subtitle: `
-    text-slate-400 text-sm
+    text-gray-500 text-sm
   `,
   form: `
     flex flex-col gap-5
   `,
   errorBox: `
-    p-3 bg-red-500/10 border border-red-500/30 rounded-lg
-    text-red-400 text-sm text-center
+    p-3 bg-red-50 border border-red-200 rounded
+    text-red-600 text-sm text-center
   `,
   inputGroup: `
     flex flex-col gap-2
   `,
   label: `
-    text-sm font-medium text-slate-300
+    text-sm font-medium text-gray-700
   `,
   input: `
-    w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg
-    text-white placeholder-slate-500
-    focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500
+    w-full px-4 py-3 bg-white border border-gray-300 rounded
+    text-gray-900 placeholder-gray-400
+    focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
     transition-colors
   `,
   submitButton: `
     w-full py-3 mt-2
-    bg-amber-500 text-slate-900 font-semibold rounded-lg
-    hover:bg-amber-400 transition-colors
+    bg-blue-600 text-white font-semibold rounded
+    hover:bg-blue-700 transition-colors
     disabled:opacity-50 disabled:cursor-not-allowed
-    flex items-center justify-center
+    flex items-center justify-center cursor-pointer
   `,
   buttonSpinner: `
-    w-5 h-5 border-2 border-slate-900/30 border-t-slate-900
+    w-5 h-5 border-2 border-white/30 border-t-white
     rounded-full animate-spin
   `,
   toggleSection: `
-    mt-6 pt-6 border-t border-slate-700
+    mt-6 pt-6 border-t border-gray-200
     flex items-center justify-center gap-2
   `,
   toggleText: `
-    text-sm text-slate-500
+    text-sm text-gray-500
   `,
   toggleButton: `
-    text-sm text-amber-500 font-medium
-    hover:text-amber-400 transition-colors
+    text-sm text-blue-600 font-medium
+    hover:text-blue-700 transition-colors
   `,
 };

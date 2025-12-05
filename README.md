@@ -13,7 +13,7 @@ A personal dashboard to trigger and manage N8N workflows via webhooks. Built wit
 - **Webhook Triggering** — Trigger N8N workflows and view responses in real-time
 - **Execution History** — Track all workflow executions with status and response data
 - **Response Parsing** — JSON responses are parsed and displayed in a structured tree view
-- **Local Storage** — All data persists locally in your browser (no backend required)
+- **Cloud Persistence** — Workflows, executions, and responses are stored per user in Firebase
 - **Portrait-Optimized UI** — Designed for vertical/portrait displays
 
 ## Getting Started
@@ -91,37 +91,60 @@ A personal dashboard to trigger and manage N8N workflows via webhooks. Built wit
 - **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
 - **Backend**: [Firebase](https://firebase.google.com/) (Firestore, Auth, Functions)
-- **Storage**: Browser localStorage (with Firebase sync)
+- **Data**: Firebase Firestore (per-user collections)
+
+## Architecture Overview
+
+- **Next.js App Router** — Marketing/auth pages at the root; authenticated experience lives under `app/(app)`
+- **Feature Packages** — UI is organized by feature in `src/packages` (workflow list/detail, execution detail, workflow modal, signup)
+- **Redux Toolkit Store** — `builders` (UI flags), `current` (selected entities), and `dumps` (collections) hydrated via async thunks
+- **API Layer** — `src/api/firestore` wraps Firestore CRUD for workflows, executions, responses, and users; webhook calls proxy through `app/api/trigger-webhook`
+- **N8N Parsing** — `src/lib/n8n` handles workflow parsing, validation, and extraction helpers
+- **Shared UI** — Layout, navigation, and marketing components live in `src/components`; auth context is in `src/context/auth`
 
 ## Project Structure
 
 ```
 src/
-├── app/                    # Next.js App Router pages
-│   ├── api/                # API routes (webhook proxy)
-│   ├── workflow/[id]/      # Workflow detail page
-│   └── workflow-execution/[id]/  # Execution detail page
-├── components/             # Shared components
-├── lib/                    # Utilities and services
-│   └── firebase/           # Firebase configuration & providers
-├── model/                  # TypeScript type definitions
-├── packages/               # Feature components
-│   ├── workflow-list/      # Workflow list & modal
-│   ├── workflow-detail/    # Workflow execution UI
-│   └── workflow-execution-detail/  # Execution details
-└── store/                  # Redux store
-    ├── builders/           # UI state slices
-    ├── current/            # Current entity slices
-    ├── dumps/              # Data collection slices
-    └── thunks/             # Async actions
+├── app/
+│   ├── layout.tsx          # Root shell (marketing/auth)
+│   ├── page.tsx            # Marketing landing
+│   ├── login/ | signup/    # Auth pages
+│   ├── api/trigger-webhook # Proxy to call N8N webhook
+│   └── (app)/              # Authenticated shell
+│       ├── layout.tsx
+│       ├── workflows/                  # Workflow list page
+│       ├── workflow/[id]/              # Workflow detail page
+│       ├── workflow-execution/[id]/    # Execution detail page
+│       └── welcome/                    # Onboarding
+├── api/
+│   └── firestore/          # Firestore services, mutators, retrievers
+├── components/             # Shared layout/navigation/marketing UI
+├── context/                # Auth context + hook
+├── lib/
+│   ├── firebase/           # Firebase config
+│   └── n8n/                # Workflow parsing, validators, extractors
+├── model/                  # Domain types
+├── packages/               # Feature modules (one component/hook per file)
+│   ├── workflow-list/              # List view + header/actions
+│   ├── workflow-detail/            # Detail view, steps, triggers, history
+│   ├── workflow-modal/             # Creation/import modal
+│   ├── workflow-execution-detail/  # Response & execution details
+│   └── signup/                     # Signup form + inputs
+├── store/                  # Redux store configuration
+│   ├── builders/           # UI state slices
+│   ├── current/            # Current entity slices
+│   ├── dumps/              # Cached collections
+│   └── thunks/             # Async calls to Firestore + webhook proxy
+└── app/globals.css         # Global Tailwind setup
 ```
 
 ## How It Works
 
-1. **Workflows** are saved configurations containing a webhook URL and default parameters
-2. When you trigger a workflow, the request is proxied through a Next.js API route to avoid CORS issues
-3. The execution (request + response) is saved to localStorage for history
-4. All data is stored locally in your browser — no external database required
+1. **Workflows** are saved per user in Firebase Firestore with webhook URL, defaults, agent prompts, and path steps
+2. Triggering a workflow sends the request through the `api/trigger-webhook` route to avoid CORS issues
+3. Executions and responses are written to Firestore and hydrated into Redux via thunks
+4. UI reads from Redux selectors; Firestore is the source of truth for persistence
 
 ## N8N Webhook Setup
 

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { getNavigationLinks } from '../navigation';
 import type { NavigationLink } from '../navigation';
 import { useAuth } from '@/context/auth';
+import { useAppSelector } from '@/store/hooks';
 
 export const AdminSidebar = () => {
   const pathname = usePathname();
@@ -13,6 +14,12 @@ export const AdminSidebar = () => {
   const { user, signOut } = useAuth();
   const navigationLinks = getNavigationLinks();
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const isHidden = useAppSelector((state) => state.layoutBuilder.isSidebarCollapsed);
+
+  // Don't render if sidebar is hidden
+  if (isHidden) {
+    return null;
+  }
 
   const isLinkActive = (href: string): boolean => {
     return pathname === href;
@@ -113,8 +120,8 @@ export const AdminSidebar = () => {
     <aside className={styles.sidebar}>
       <div className={styles.inner}>
         <div className={styles.header}>
-          <div className={styles.logoMark}>⚡</div>
-          <span className={styles.logoText}>N8N Dashboard</span>
+          <div className={styles.logoMark}>N8</div>
+          <span className={styles.logoText}>Workflows</span>
         </div>
 
         <nav className={styles.navigation}>
@@ -146,22 +153,22 @@ export const AdminSidebar = () => {
 
 const styles = {
   sidebar: `
-    relative flex h-screen w-[229px] flex-col
-    border-r border-slate-700 bg-slate-800
+    relative flex h-screen w-[160px] flex-col
+    border-r border-gray-200 bg-white
     overflow-y-auto
   `,
   inner: `
     flex h-full flex-1 flex-col gap-3 p-3
   `,
   header: `
-    flex items-center gap-2 rounded-md bg-slate-900 px-2 py-3
+    flex items-center gap-2 rounded-md bg-gray-50 px-2 py-3
   `,
   logoMark: `
-    flex h-8 w-8 items-center justify-center
-    rounded-md bg-amber-500 text-slate-900 font-bold text-sm
+    flex h-8 w-8 items-center justify-center rounded-md
+    border border-gray-200 bg-blue-600 text-white font-bold text-sm
   `,
   logoText: `
-    font-display text-sm font-semibold text-white
+    font-sans text-sm font-semibold text-gray-800
   `,
   navigation: `
     flex-1 overflow-y-auto
@@ -177,57 +184,56 @@ const styles = {
   `,
   menuButton: `
     flex flex-1 items-center gap-2 rounded-md px-2 py-1.5
-    text-xs font-medium text-slate-400
-    transition-colors hover:bg-slate-700 hover:text-white
+    text-xs font-medium text-gray-600
+    transition-colors hover:bg-gray-100 hover:text-gray-900
   `,
   menuButtonActive: `
-    bg-amber-500/10 text-amber-500
+    bg-blue-50 text-blue-700
   `,
   menuButtonInactive: `
     bg-transparent
   `,
   chevronButton: `
     flex items-center justify-center w-6 h-6
-    rounded hover:bg-slate-700 transition-colors
+    rounded hover:bg-gray-100 transition-colors cursor-pointer
   `,
   chevronIcon: `
-    w-3 h-3 text-slate-500 transition-transform duration-200
+    w-3 h-3 text-gray-400 transition-transform duration-200
   `,
   chevronExpanded: `
     rotate-90
   `,
   childMenuList: `
     ml-3 mt-0.5 flex flex-col gap-0.5
-    border-l border-slate-700 pl-2
+    border-l border-gray-200 pl-2
   `,
   childMenuItem: `
     group relative
   `,
   childMenuButton: `
     flex w-full items-center gap-2 rounded-md px-2 py-1
-    text-xs font-medium text-slate-500
-    transition-colors hover:bg-slate-700 hover:text-white
+    text-xs font-medium text-gray-500
+    transition-colors hover:bg-gray-100 hover:text-gray-900
   `,
   footer: `
-    mt-auto pt-3 border-t border-slate-700
+    mt-auto pt-3 border-t border-gray-200
     flex flex-col gap-3
   `,
   userInfo: `
     flex items-center gap-2
   `,
   userAvatar: `
-    w-8 h-8 rounded-full bg-slate-700
+    w-8 h-8 rounded-full bg-gray-100
     flex items-center justify-center
-    text-xs font-medium text-slate-300
+    text-xs font-medium text-gray-600
   `,
   userEmail: `
-    text-xs text-slate-400 truncate flex-1
+    text-xs text-gray-600 truncate flex-1
   `,
   signOutButton: `
     w-full px-2 py-1.5 rounded-md
-    text-xs font-medium text-slate-400
-    hover:bg-slate-700 hover:text-white
-    transition-colors text-left
+    text-xs font-medium text-gray-600
+    hover:bg-gray-100 hover:text-gray-900
+    transition-colors text-left cursor-pointer
   `,
 };
-

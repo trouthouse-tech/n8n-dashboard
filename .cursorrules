@@ -1,0 +1,160 @@
+# N8N Workflow Dashboard - Cursor Rules
+
+## Core Principles
+
+### Maximum File Size
+- **Hard limit: 150 lines per file** (including styles)
+- If a component exceeds 150 lines, it MUST be split into sub-components
+- Main `index.tsx` files should be orchestration only - no business logic
+
+### One Function/Component Per File
+- Each React component MUST be in its own file
+- Each utility function MUST be in its own file
+- Each custom hook MUST be in its own file
+- NO inline sub-components - extract them to separate files
+
+---
+
+## Component Architecture
+
+### Redux-First State Management
+- Components should access Redux store directly via `useAppSelector`
+- **AVOID prop drilling** - if a child component needs data, it should get it from Redux
+- Only pass IDs or minimal identifiers as props
+- Use Redux actions for state mutations, not callbacks passed as props
+
+### Props Philosophy
+- Props should be **minimal** - IDs, refs, or simple flags only
+- If you're passing more than 3 props, reconsider the component design
+- Children components should fetch their own data from Redux
+- Exception: Shared/generic components (buttons, inputs) can have more props
+
+### Component Responsibilities
+- **Main `index.tsx`**: Orchestration, layout, loading states, tab switching
+- **Sub-components**: Single responsibility - one section, one feature
+- **Shared components**: Reusable UI elements in `src/components/`
+
+---
+
+## File Structure
+
+### Feature Directories
+```
+src/packages/<feature-name>/
+├── index.tsx                    # Main orchestration component (~100 lines max)
+├── components/                  # Feature-specific sub-components
+│   ├── FeatureHeader.tsx        # Header section
+│   ├── FeatureSection.tsx       # Content sections
+│   └── index.ts                 # Barrel export
+├── hooks/                       # Feature-specific hooks (if needed)
+│   └── useFeatureLogic.ts
+└── utils/                       # Feature-specific utilities (if needed)
+    └── helpers.ts
+```
+
+### Naming Conventions
+- Directories: `kebab-case` (e.g., `workflow-modal`, `upload-zone`)
+- Components: `PascalCase` (e.g., `WorkflowModal`, `UploadZone`)
+- Hooks: `camelCase` with `use` prefix (e.g., `useWorkflowData`)
+- Utils: `camelCase` (e.g., `parseWorkflow`, `formatDate`)
+
+### Imports
+- Absolute imports with `@/` for cross-feature imports
+- Relative imports for files within the same feature directory
+- Barrel exports (`index.ts`) for clean imports
+
+---
+
+## When to Extract
+
+### Extract a new component when:
+1. A section of JSX exceeds 30 lines
+2. A piece of UI is repeated
+3. A section has its own state or handlers
+4. A section could be tested independently
+5. The parent component exceeds 150 lines
+
+### Extract a custom hook when:
+1. Multiple `useEffect` or `useState` calls are related
+2. Business logic is cluttering the component
+3. The same logic is used in multiple components
+4. Complex data fetching or transformations
+
+### Extract a utility function when:
+1. Logic is pure (no React hooks or state)
+2. Logic could be reused elsewhere
+3. Logic is complex enough to warrant unit testing
+
+---
+
+## Styling
+
+- Use Tailwind CSS utility classes
+- Define styles as `const styles = {}` object at the bottom of each file
+- Styles object uses template literal strings for class combinations
+- Keep styles co-located with their component
+
+---
+
+## Example: Refactoring a Large Component
+
+### ❌ BAD: Monolithic 600+ line file
+```tsx
+// WorkflowModal.tsx - 600 lines
+export const WorkflowModal = () => {
+  // 50 lines of state and hooks
+  // 100 lines of handlers
+  // 400 lines of JSX with inline rendering functions
+  // 50 lines of styles
+}
+```
+
+### ✅ GOOD: Modular structure
+```
+workflow-modal/
+├── index.tsx                    # ~80 lines - modal shell, open/close logic
+├── components/
+│   ├── UploadZone.tsx          # ~60 lines - drag/drop file upload
+│   ├── WorkflowPreview.tsx     # ~80 lines - parsed workflow display
+│   ├── ManualForm.tsx          # ~70 lines - manual configuration form
+│   ├── ModalFooter.tsx         # ~30 lines - cancel/save buttons
+│   └── index.ts
+├── hooks/
+│   └── useWorkflowUpload.ts    # ~50 lines - file parsing logic
+└── utils/
+    └── parseWorkflow.ts        # Already in lib/n8n/
+```
+
+---
+
+## Redux Store Patterns
+
+### Slice Organization
+- One slice per domain (workflow, user, etc.)
+- Keep slices focused - split if > 200 lines
+- Use builder pattern for async thunks
+
+### Component-Store Connection
+```tsx
+// ✅ GOOD: Component reads from Redux directly
+export const WorkflowPreview = () => {
+  const parsedWorkflow = useAppSelector(state => state.workflowBuilder.parsedWorkflow);
+  // render...
+}
+
+// ❌ BAD: Prop drilling from parent
+export const WorkflowPreview = ({ parsedWorkflow }: Props) => {
+  // render...
+}
+```
+
+---
+
+## Checklist Before Creating a Component
+
+1. [ ] Will this file be under 150 lines?
+2. [ ] Does this component have a single responsibility?
+3. [ ] Am I avoiding prop drilling?
+4. [ ] Are sub-sections extracted to their own files?
+5. [ ] Is business logic in hooks/utils, not inline?
+6. [ ] Can this component access what it needs from Redux?

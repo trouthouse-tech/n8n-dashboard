@@ -7,12 +7,12 @@ export interface NavigationLink {
 export const getNavigationLinks = (): NavigationLink[] => {
   return [
     {
-      name: 'Home',
+      name: 'Welcome',
       href: '/welcome',
     },
     {
       name: 'Workflows',
-      href: '/welcome',
+      href: '/workflows',
     },
   ];
 };

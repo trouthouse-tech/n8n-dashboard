@@ -9,17 +9,22 @@ export type {
   ParsedConnection,
   ParsedWebhook,
   DetectedParam,
+  DetectedAgent,
+  DetectedModel,
+  DetectedCode,
+  DetectedHttp,
   NodeCategory,
 } from './types';
 
-// Main parser
-export {
-  parseN8nWorkflow,
-  parseN8nWorkflowFromString,
-  isN8nWorkflow,
-} from './parseWorkflow';
+// Main parsers
+export { parseN8nWorkflow } from './parseWorkflow';
+export { parseN8nWorkflowFromString } from './parseWorkflowFromString';
+export { createEmptyWorkflow } from './createEmptyWorkflow';
 
-// Extractors
+// Validators
+export { isN8nWorkflow, generateWarnings } from './validators';
+
+// Node extractors
 export {
   parseNode,
   parseNodes,
@@ -29,6 +34,7 @@ export {
   getCategoryColor,
 } from './extractors/nodes';
 
+// Connection extractors
 export {
   parseConnections,
   buildAdjacencyList,
@@ -37,6 +43,7 @@ export {
   getWorkflowDepth,
 } from './extractors/connections';
 
+// Webhook extractors
 export {
   isWebhookNode,
   extractWebhookInfo,
@@ -45,3 +52,10 @@ export {
   buildWebhookUrl,
 } from './extractors/webhook';
 
+// Dynamic data extractors
+export { extractParams } from './extractors/params';
+export { extractAgents } from './extractors/agents';
+export { extractModels } from './extractors/models';
+export { extractCode } from './extractors/code';
+export { extractHttp } from './extractors/http';
+export { extractPathSteps } from './extractors/pathSteps';

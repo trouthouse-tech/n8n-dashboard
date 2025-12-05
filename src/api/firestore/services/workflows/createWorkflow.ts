@@ -1,6 +1,6 @@
 import { createDocument } from '../../mutators/createDocument';
 import { FIRESTORE_COLLECTIONS } from '../../types';
-import { Workflow, WorkflowBodyParam } from '@/model';
+import { Workflow, WorkflowBodyParam, WorkflowAgentPrompt, WorkflowPathStep } from '@/model';
 import { generateFirebaseId } from '../../utils/generateFirebaseId';
 
 export interface CreateWorkflowInput {
@@ -9,6 +9,8 @@ export interface CreateWorkflowInput {
   description: string;
   webhookUrl: string;
   defaultBody: WorkflowBodyParam[];
+  agentPrompts: WorkflowAgentPrompt[];
+  pathSteps: WorkflowPathStep[];
 }
 
 export const createWorkflow = async (input: CreateWorkflowInput) => {

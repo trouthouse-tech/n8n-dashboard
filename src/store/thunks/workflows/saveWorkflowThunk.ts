@@ -26,6 +26,8 @@ export const saveWorkflowThunk = (
           description: workflow.description,
           webhookUrl: workflow.webhookUrl,
           defaultBody: workflow.defaultBody,
+          agentPrompts: workflow.agentPrompts ?? [],
+          pathSteps: workflow.pathSteps ?? [],
         });
 
         if (!response.success || !response.data) {
@@ -42,6 +44,8 @@ export const saveWorkflowThunk = (
           description: workflow.description,
           webhookUrl: workflow.webhookUrl,
           defaultBody: workflow.defaultBody,
+          agentPrompts: workflow.agentPrompts ?? [],
+          pathSteps: workflow.pathSteps ?? [],
         });
 
         if (!response.success || !response.data) {

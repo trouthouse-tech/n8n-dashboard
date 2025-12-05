@@ -35,14 +35,14 @@ export const MarketingHeader = () => {
 const styles = {
   header: `
     fixed top-0 left-0 right-0 z-50
-    border-b border-slate-800 bg-slate-900/80 backdrop-blur-md
+    border-b border-gray-200 bg-white/80 backdrop-blur-md
   `,
   container: `
     max-w-6xl mx-auto px-6 h-16
     flex items-center justify-between
   `,
   logo: `
-    flex items-center gap-2 text-white font-semibold text-lg
+    flex items-center gap-2 text-gray-900 font-semibold text-lg
     hover:opacity-80 transition-opacity
   `,
   logoIcon: `
@@ -55,16 +55,16 @@ const styles = {
     flex items-center gap-4
   `,
   loginButton: `
-    px-4 py-2 text-sm font-medium text-slate-300
-    hover:text-white transition-colors
+    px-4 py-2 text-sm font-medium text-gray-600
+    hover:text-gray-900 transition-colors
   `,
   openAppButton: `
     px-4 py-2 text-sm font-medium
-    bg-amber-500 text-slate-900 rounded-lg
-    hover:bg-amber-400 transition-colors
+    bg-blue-600 text-white rounded
+    hover:bg-blue-700 transition-colors
   `,
   loadingDot: `
-    w-2 h-2 bg-slate-600 rounded-full animate-pulse
+    w-2 h-2 bg-gray-300 rounded-full animate-pulse
   `,
 };
 

@@ -9,7 +9,7 @@ import {
   currentWorkflowReducer,
   currentWorkflowExecutionReducer,
 } from './current';
-import { workflowBuilderReducer } from './builders';
+import { workflowBuilderReducer, layoutBuilderReducer } from './builders';
 
 const rootReducer = combineReducers({
   // Dumps
@@ -24,6 +24,7 @@ const rootReducer = combineReducers({
 
   // Builders
   workflowBuilder: workflowBuilderReducer,
+  layoutBuilder: layoutBuilderReducer,
 });
 
 export default rootReducer;

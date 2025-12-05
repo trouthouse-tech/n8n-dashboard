@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Workflow, WorkflowBodyParam } from '../../model';
+import { Workflow, WorkflowBodyParam, WorkflowAgentPrompt, WorkflowPathStep } from '../../model';
 
 const initialState: Workflow = {
   id: '',
@@ -7,6 +7,8 @@ const initialState: Workflow = {
   description: '',
   webhookUrl: '',
   defaultBody: [],
+  agentPrompts: [],
+  pathSteps: [],
   createdAt: '',
   updatedAt: '',
 };
@@ -39,6 +41,18 @@ export const currentWorkflowSlice = createSlice({
     },
     removeBodyParam: (state, action: PayloadAction<string>) => {
       state.defaultBody = state.defaultBody.filter((p) => p.id !== action.payload);
+    },
+    setAgentPrompts: (state, action: PayloadAction<WorkflowAgentPrompt[]>) => {
+      state.agentPrompts = action.payload;
+    },
+    updateAgentPrompt: (state, action: PayloadAction<WorkflowAgentPrompt>) => {
+      const index = state.agentPrompts.findIndex((p) => p.id === action.payload.id);
+      if (index !== -1) {
+        state.agentPrompts[index] = action.payload;
+      }
+    },
+    setPathSteps: (state, action: PayloadAction<WorkflowPathStep[]>) => {
+      state.pathSteps = action.payload;
     },
     updateWorkflow: (state, action: PayloadAction<Partial<Workflow>>) => {
       return { ...state, ...action.payload };

@@ -2,10 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { WorkflowBuilderActions } from '../../store/builders';
 import { CurrentWorkflowActions } from '../../store/current';
+import { WorkflowBuilderActions } from '../../store/builders';
 import { deleteWorkflowThunk } from '../../store/thunks';
-import { Workflow } from '../../model';
+import { WorkflowRowActions } from './components';
 
 export const WorkflowList = () => {
   const router = useRouter();
@@ -13,14 +13,20 @@ export const WorkflowList = () => {
   const workflows = useAppSelector((state) => state.workflows);
   const workflowList = Object.values(workflows);
 
-  const handleAddNew = () => {
-    dispatch(CurrentWorkflowActions.reset());
-    dispatch(WorkflowBuilderActions.openModal());
+  const handleRowClick = (workflowId: string) => {
+    const workflow = workflows[workflowId];
+    if (workflow) {
+      dispatch(CurrentWorkflowActions.setWorkflow(workflow));
+      router.push(`/workflow/${workflowId}`);
+    }
   };
 
-  const handleEdit = (workflow: Workflow) => {
-    dispatch(CurrentWorkflowActions.setWorkflow(workflow));
-    dispatch(WorkflowBuilderActions.openModal());
+  const handleEdit = (workflowId: string) => {
+    const workflow = workflows[workflowId];
+    if (workflow) {
+      dispatch(CurrentWorkflowActions.setWorkflow(workflow));
+      dispatch(WorkflowBuilderActions.openModal());
+    }
   };
 
   const handleDelete = (workflowId: string) => {
@@ -29,122 +35,69 @@ export const WorkflowList = () => {
     }
   };
 
-  const handleRun = (workflow: Workflow) => {
-    dispatch(CurrentWorkflowActions.setWorkflow(workflow));
-    router.push(`/workflow/${workflow.id}`);
-  };
+  if (workflowList.length === 0) {
+    return (
+      <div className={styles.emptyState}>
+        <p className={styles.emptyTitle}>No workflows found</p>
+        <p className={styles.emptyDescription}>
+          Add a workflow to start triggering N8N webhooks.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>Workflows</h2>
-        <button onClick={handleAddNew} className={styles.addButton}>
-          + Add Workflow
-        </button>
-      </div>
-
-      {workflowList.length === 0 ? (
-        <div className={styles.emptyState}>
-          <p className={styles.emptyText}>No workflows yet</p>
-          <p className={styles.emptySubtext}>
-            Add a workflow to start triggering N8N webhooks
-          </p>
-        </div>
-      ) : (
-        <div className={styles.list}>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th className={styles.th}>Name</th>
+            <th className={styles.thActions}></th>
+          </tr>
+        </thead>
+        <tbody>
           {workflowList.map((workflow) => (
-            <div key={workflow.id} className={styles.card}>
-              <div className={styles.cardContent}>
-                <h3 className={styles.cardTitle}>{workflow.name}</h3>
-                {workflow.description && (
-                  <p className={styles.cardDescription}>{workflow.description}</p>
-                )}
-                <p className={styles.cardUrl}>{workflow.webhookUrl}</p>
-              </div>
-              <div className={styles.cardActions}>
-                <button
-                  onClick={() => handleRun(workflow)}
-                  className={styles.runButton}
-                >
-                  Run
-                </button>
-                <button
-                  onClick={() => handleEdit(workflow)}
-                  className={styles.editButton}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(workflow.id)}
-                  className={styles.deleteButton}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
+            <tr
+              key={workflow.id}
+              onClick={() => handleRowClick(workflow.id)}
+              className={styles.row}
+            >
+              <td className={styles.td}>
+                <span className={styles.name}>{workflow.name}</span>
+              </td>
+              <td className={styles.tdActions}>
+                <WorkflowRowActions
+                  onEdit={() => handleEdit(workflow.id)}
+                  onDelete={() => handleDelete(workflow.id)}
+                />
+              </td>
+            </tr>
           ))}
-        </div>
-      )}
+        </tbody>
+      </table>
     </div>
   );
 };
 
 const styles = {
-  container: `
-    flex flex-col gap-4
+  container: `bg-white rounded-lg border border-gray-200`,
+  emptyState: `p-12 text-center bg-white rounded-lg border border-gray-200`,
+  emptyTitle: `text-base font-semibold text-gray-800`,
+  emptyDescription: `text-sm text-gray-500 mt-1`,
+  table: `w-full border-collapse text-sm`,
+  th: `
+    px-4 py-2.5 text-left text-xs font-semibold text-gray-500
+    uppercase tracking-wide bg-gray-50 border-b border-gray-200
   `,
-  header: `
-    flex items-center justify-between
+  thActions: `
+    px-4 py-2.5 text-right text-xs font-semibold text-gray-500
+    uppercase tracking-wide bg-gray-50 border-b border-gray-200 w-12
   `,
-  title: `
-    text-lg font-semibold text-white
+  row: `
+    cursor-pointer hover:bg-blue-50 transition-colors
+    border-b border-gray-100 last:border-b-0
   `,
-  addButton: `
-    px-4 py-2 bg-amber-500 text-slate-900 font-medium rounded-lg
-    hover:bg-amber-400 transition-colors cursor-pointer text-sm
-  `,
-  emptyState: `
-    py-12 text-center
-  `,
-  emptyText: `
-    text-slate-400 text-lg
-  `,
-  emptySubtext: `
-    text-slate-600 text-sm mt-1
-  `,
-  list: `
-    flex flex-col gap-3
-  `,
-  card: `
-    bg-slate-800/60 border border-slate-700/50 rounded-xl p-4
-    flex flex-col gap-3
-  `,
-  cardContent: `
-    flex flex-col gap-1
-  `,
-  cardTitle: `
-    text-white font-medium
-  `,
-  cardDescription: `
-    text-slate-400 text-sm
-  `,
-  cardUrl: `
-    text-slate-500 text-xs font-mono truncate
-  `,
-  cardActions: `
-    flex gap-2
-  `,
-  runButton: `
-    flex-1 py-2 bg-emerald-500/20 text-emerald-400 font-medium rounded-lg
-    hover:bg-emerald-500/30 transition-colors text-center text-sm cursor-pointer
-  `,
-  editButton: `
-    px-4 py-2 bg-slate-700/50 text-slate-300 font-medium rounded-lg
-    hover:bg-slate-700 transition-colors cursor-pointer text-sm
-  `,
-  deleteButton: `
-    px-4 py-2 bg-red-500/10 text-red-400 font-medium rounded-lg
-    hover:bg-red-500/20 transition-colors cursor-pointer text-sm
-  `,
+  td: `px-4 py-3`,
+  tdActions: `px-4 py-3 text-right`,
+  name: `font-medium text-gray-900`,
 };
-

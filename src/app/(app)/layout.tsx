@@ -3,15 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth';
-import { AdminSidebar } from '@/components/sidebar';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getUserThunk, loadWorkflowsThunk, loadExecutionsThunk } from '@/store/thunks';
 
-interface AppLayoutProps {
+interface AuthLayoutProps {
   children: React.ReactNode;
 }
 
-export default function AppLayout({ children }: AppLayoutProps) {
+export default function AuthLayout({ children }: AuthLayoutProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { user: authUser, loading: authLoading } = useAuth();
@@ -85,30 +84,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
     );
   }
 
-  return (
-    <div className={styles.appContainer}>
-      <AdminSidebar />
-      <main className={styles.mainContent}>
-        {children}
-      </main>
-    </div>
-  );
+  return <>{children}</>;
 }
 
 const styles = {
   loadingContainer: `
-    min-h-screen bg-slate-900
+    min-h-screen bg-white
     flex items-center justify-center
   `,
   spinner: `
-    w-8 h-8 border-2 border-slate-700 border-t-amber-500
+    w-8 h-8 border-2 border-gray-200 border-t-blue-600
     rounded-full animate-spin
   `,
-  appContainer: `
-    flex h-screen overflow-hidden bg-slate-900
-  `,
-  mainContent: `
-    flex-1 overflow-y-auto
-  `,
 };
-

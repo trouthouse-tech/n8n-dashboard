@@ -117,12 +117,52 @@ export interface ParsedWebhook {
 }
 
 /**
- * Detected required parameter from If/Switch conditions
+ * Detected required parameter from expressions
  */
 export interface DetectedParam {
   key: string;
-  source: string;           // Which node detected it from
-  expression: string;       // Original expression
+  source: string;
+  expression: string;
+}
+
+/**
+ * AI Agent node with prompts
+ */
+export interface DetectedAgent {
+  nodeId: string;
+  nodeName: string;
+  userPrompt: string;
+  systemPrompt: string;
+}
+
+/**
+ * LLM Model node
+ */
+export interface DetectedModel {
+  nodeId: string;
+  nodeName: string;
+  provider: string;
+  model: string;
+}
+
+/**
+ * Code node with JavaScript
+ */
+export interface DetectedCode {
+  nodeId: string;
+  nodeName: string;
+  code: string;
+}
+
+/**
+ * HTTP Request node
+ */
+export interface DetectedHttp {
+  nodeId: string;
+  nodeName: string;
+  method: string;
+  url: string;
+  hasBody: boolean;
 }
 
 /**
@@ -147,8 +187,12 @@ export interface ParsedWorkflow {
   webhooks: ParsedWebhook[];
   primaryWebhook: ParsedWebhook | null;
   
-  // Detected params (future enhancement)
+  // Dynamic data
   detectedParams: DetectedParam[];
+  agents: DetectedAgent[];
+  models: DetectedModel[];
+  codeNodes: DetectedCode[];
+  httpNodes: DetectedHttp[];
   
   // Validation
   warnings: string[];

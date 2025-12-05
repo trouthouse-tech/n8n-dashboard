@@ -156,18 +156,18 @@ const styles = {
     flex flex-col gap-5
   `,
   errorBox: `
-    p-3 bg-red-500/10 border border-red-500/30 rounded-lg
-    text-red-400 text-sm text-center
+    p-3 bg-red-50 border border-red-200 rounded
+    text-red-600 text-sm text-center
   `,
   submitButton: `
     w-full py-3 mt-2
-    bg-amber-500 text-slate-900 font-semibold rounded-lg
-    hover:bg-amber-400 transition-colors
+    bg-blue-600 text-white font-semibold rounded
+    hover:bg-blue-700 transition-colors
     disabled:opacity-50 disabled:cursor-not-allowed
-    flex items-center justify-center
+    flex items-center justify-center cursor-pointer
   `,
   buttonSpinner: `
-    w-5 h-5 border-2 border-slate-900/30 border-t-slate-900
+    w-5 h-5 border-2 border-white/30 border-t-white
     rounded-full animate-spin
   `,
 };

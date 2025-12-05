@@ -41,12 +41,12 @@ const styles = {
     flex flex-col gap-2
   `,
   label: `
-    text-sm font-medium text-slate-300
+    text-sm font-medium text-gray-700
   `,
   textarea: `
-    w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg
-    text-white placeholder-slate-500
-    focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500
+    w-full px-4 py-3 bg-white border border-gray-300 rounded
+    text-gray-900 placeholder-gray-400
+    focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
     transition-colors resize-none
   `,
 };
