@@ -6,6 +6,19 @@ A personal dashboard to trigger and manage N8N workflows via webhooks. Built wit
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![Redux](https://img.shields.io/badge/Redux-Toolkit-purple?style=flat-square&logo=redux)
 
+## Versions
+
+| Branch | Backend | Auth Required | Best For |
+|--------|---------|---------------|----------|
+| `main` | Firebase (Firestore + Auth) | Yes | Multi-device sync, user accounts |
+| `local-only-dyanmic-workflow-import` | Browser localStorage | No | Quick setup, single device, no account needed |
+
+**Want the local-only version?** No Firebase setup required — just clone and run:
+```bash
+git checkout local-only-dyanmic-workflow-import
+npm install && npm run dev
+```
+
 ## Features
 
 - **Workflow Management** — Create, edit, and delete workflow configurations
